@@ -55,7 +55,7 @@
   let currentVirtualContext = null;
   let someContextsNeedRendering;
 
-  const sharedWebGLContext = document.createElement('canvas').getContext('webgl');
+  const sharedWebGLContext = document.createElement('canvas').getContext('webgl', { antialias: true });
   const sharedVAOExtension = sharedWebGLContext.getExtension("OES_vertex_array_object");
   const sharedInstanceExtension = sharedWebGLContext.getExtension("ANGLE_instanced_arrays");
   const numAttributes = sharedWebGLContext.getParameter(sharedWebGLContext.MAX_VERTEX_ATTRIBS);
@@ -158,12 +158,13 @@
       const height = canvas.height;
       const maxWidth = Math.max(gl.canvas.width, width);
       const maxHeight = Math.max(gl.canvas.height, height);
+      const factor = 2;
       if (gl.canvas.width !== maxWidth || gl.canvas.height !== maxHeight) {
-        gl.canvas.width = maxWidth;
-        gl.canvas.height = maxHeight;
+        gl.canvas.width = maxWidth * factor;
+        gl.canvas.height = maxHeight * factor;
       }
 
-      gl.viewport(0, 0, width, height);
+      gl.viewport(0, 0, width * factor, height * factor);
 
       gl.useProgram(contextAttributes.premultipliedAlpha ? premultplyAlphaTrueProgram : premultplyAlphaFalseProgram);
 
@@ -175,7 +176,7 @@
       ctx.globalCompositeOperation = 'copy';
       ctx.drawImage(
         gl.canvas,
-        0, maxHeight - height, width, height,   // src rect
+        0, maxHeight - height * factor, width * factor, height * factor,   // src rect
         0, 0, width, height);  // dest rect
     }
     dispose() {
@@ -197,7 +198,7 @@
       this._drawingbufferFramebuffer = gl.createFramebuffer();
       this._contextAttributes = {
         alpha: valueOrDefault(contextAttributes.alpha, true),
-        antialias: false,
+        antialias: true,
         depth: valueOrDefault(contextAttributes.depth, true),
         failIfMajorPerformanceCaveat: false,
         premultipliedAlpha: valueOrDefault(contextAttributes.premultipliedAlpha, true),
